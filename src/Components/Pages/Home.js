@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import { useForm } from "../../Hooks/useForm";
+import FetchUser from "../Reusable/FetchUser"
 
 const XIVAPI = require("@xivapi/js");
 const xiv = new XIVAPI();
@@ -18,12 +19,14 @@ export default function Home() {
         onChange={handleChange}
       />
       <input
-        type="worldName"
-        name="worldName"
-        placeholder="World Name"
-        value={values.worldName}
+        type="server"
+        name="server"
+        placeholder="Server Name"
+        value={values.serverName}
         onChange={handleChange}
       />
+      <input type="submit"/>
+      
     </div>
   );
 }
