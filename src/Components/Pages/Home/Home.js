@@ -13,7 +13,6 @@ export default function Home() {
     formState: { errors },
   } = useForm();
   const [matches, setMatches] = useState({});
-  const [user, setUser] = useState({});
   let history = useHistory();
 
   const onSubmit = (info) => {
