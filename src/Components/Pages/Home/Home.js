@@ -1,74 +1,74 @@
-import React, { useState, useEffect } from "react";
-import { useForm } from "../../../Hooks/useForm";
-import { useFetch } from "../../../Hooks/useFetch";
+import React, { useState } from "react";
+import "./Style/Home.css";
 import { ffxiv } from "../../../APIKeys/xivApiKey";
-
-function FetchUserInfo(ready, values) {
-  const res = useFetch(ready, `https://xivapi.com/character/search?name=${values.charName}&server=${values.server}&private_key=${ffxiv.private_key}`,
-  { mode: "cors" })
-  if(ready) {
-    if (!res.response) {
-      return <div>Loading...</div>;
-    }
-    if (res.response) {
-      console.log("response from fetchUserInfo", res);
-  
-      return (
-        <div>
-          <h1>Hit Fetch User Info</h1>
-        </div>
-      );
-    }
-  }
-}
+import axios from "axios";
+import { useForm } from "react-hook-form"; //https://www.youtube.com/watch?v=bU_eq8qyjic
 
 export default function Home() {
-  const [values, handleChange] = useForm({ charName: "", server: "" });
-  const [user, setUser] = useState({ initialized: true });
-  const [ready, setReady] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const [user, setUser] = useState({});
 
-   useEffect(() => {
-     if (values.charName) {
-      fetch(
-        `https://xivapi.com/character/search?name=${values.charName}&server=${values.server}&private_key=${ffxiv.private_key}`,
-        { mode: "cors" }
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Char name and Server:", values.charName, values.server);
-          console.info(data.Results[0].ID);
-          const res = data.Results[0];
-          setUser((user) => ({ ...user, ...res }));
-          console.log("user info", user);
-        });
-    } 
-  }, [ready]); 
+  const onSubmit = (info) => {
+    console.log("info: ", info);
+    //cancel token to stop multiple
+    let cancelToken;
+    if (typeof cancelToken != typeof undefined) {
+      cancelToken.cancel("Cancelling the previous request");
+    }
+    cancelToken = axios.CancelToken.source();
 
-  const toggleReady = React.useCallback((e) => {
-    e.preventDefault();
-    setReady((ready) => !ready);
-  }, []);
+    axios({
+      method: "get",
+      url: `https://xivapi.com/character/search?name=${info.charName}&server=${info.server}&private_key=${ffxiv.private_key}`,
+    }).then((response) => {
+      let newResponse = { ...response.data };
+      console.log("newResponse", newResponse);
+      axios({
+        method: "get",
+        url: `https://xivapi.com/character/${response.data.Results[0].ID}&private_key=${ffxiv.private_key}`,
+      })
+        .then((res) => {
+          let newData = { ...res.data };
+          setUser((currentUser) => {
+            return {
+              ...currentUser,
+              ...newData,
+            };
+          });
+        })
+        .catch((err) => console.log("error: ", err.message));
+    });
+  };
 
   return (
     <div>
       <h1>Final Fantasy Crafting Picker</h1>
-      <input
-        type="text"
-        name="charName"
-        placeholder="Character Name"
-        value={values.charName}
-        onChange={handleChange}
-      />
-      <input
-        type="text"
-        name="server"
-        placeholder="Server Name"
-        value={values.server}
-        onChange={handleChange}
-      />
-      <input type="Submit" onClick={toggleReady}></input>
-      <div>
-        {/* <FetchUserInfo ready={ready} values={values} /> */}
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <input
+          type="text"
+          name="charName"
+          placeholder="Character Name"
+          {...register("charName", { required: true })}
+        />
+        {errors.charName && <p>{errors.charName.message}</p>}
+        <input
+          type="text"
+          name="server"
+          placeholder="Server Name"
+          {...register("server", { required: true })}
+        />
+        {errors.server && <p>{errors.server.message}</p>}
+        <input type="submit" />
+      </form>
+      <div className="results">
+        <h1>{user.Name}</h1>
+        <h3>{user.ID}</h3>
+        {/* <p>{JSON.stringify(user)}</p> */}
+        <img src={user.Avatar} alt="Your Character Avatar" />
       </div>
     </div>
   );
