@@ -1,0 +1,97 @@
+.navbar {
+  top: 0;
+  position: fixed;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  background-color: #020004;
+  width: 100vw;
+  height: 80px;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: start;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.menu-bars {
+  margin-left: 2rem;
+  font-size: 2rem;
+  background: none;
+}
+
+.nav-menu {
+  background-color: #020004;
+  width: 250px;
+  height: 100vh;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  position: fixed;
+  top: 0;
+  left: -100%;
+}
+
+.nav-menu.active {
+  left: 0;
+  position: fixed;
+  width: 30vh;
+}
+
+.nav-text {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: start;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 8px 0px 8px 16px;
+  list-style: none;
+  height: 60px;
+  size: 2rem;
+  width: 35vh;
+}
+
+.nav-icon {
+  size: 15rem;
+}
+
+.nav-text a {
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+  height: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-stretch: extra-expanded;
+  width: 30vh;
+}
+
+.nav-text a:hover {
+  background-color: #6000ba;
+}
+
+.nav-menu-items {
+  position: absolute;
+  top: 50px;
+  background-color: #020004;
+  z-index: 100;
+}
+
+span {
+  margin-left: 16px;
+}
+/*# sourceMappingURL=Navbar.css.map */
