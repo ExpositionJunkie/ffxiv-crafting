@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import "./Style/Home.css";
-import { ffxiv } from "../../../APIKeys/xivApiKey";
+import { charWithNameAndServer } from "../../Reusable/Variables/XIVApiUrls";
 import axios from "axios";
 import { useForm } from "react-hook-form"; //https://www.youtube.com/watch?v=bU_eq8qyjic
+import CharImageList from "../../Reusable/CharImageList/CharImageList";
+import { useHistory } from "react-router-dom";
 
 export default function Home() {
   const {
@@ -10,10 +12,16 @@ export default function Home() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const [matches, setMatches] = useState({});
   const [user, setUser] = useState({});
+  let history = useHistory();
 
   const onSubmit = (info) => {
     console.log("info: ", info);
+    newResponse(info);
+  };
+
+  const newResponse = async (info) => {
     //cancel token to stop multiple
     let cancelToken;
     if (typeof cancelToken != typeof undefined) {
@@ -21,27 +29,15 @@ export default function Home() {
     }
     cancelToken = axios.CancelToken.source();
 
-    axios({
+    const response = await axios({
       method: "get",
-      url: `https://xivapi.com/character/search?name=${info.charName}&server=${info.server}&private_key=${ffxiv.private_key}`,
-    }).then((response) => {
-      let newResponse = { ...response.data };
-      console.log("newResponse", newResponse);
-      axios({
-        method: "get",
-        url: `https://xivapi.com/character/${response.data.Results[0].ID}&private_key=${ffxiv.private_key}`,
-      })
-        .then((res) => {
-          let newData = { ...res.data };
-          setUser((currentUser) => {
-            return {
-              ...currentUser,
-              ...newData,
-            };
-          });
-        })
-        .catch((err) => console.log("error: ", err.message));
+      url: charWithNameAndServer(info.charName, info.server),
+      cancelToken: cancelToken.token,
     });
+
+    console.log("response.data", response.data);
+    setMatches({items: response.data.Results});
+    console.log("matches:", matches);
   };
 
   return (
@@ -64,11 +60,10 @@ export default function Home() {
         {errors.server && <p>{errors.server.message}</p>}
         <input type="submit" />
       </form>
-      <div className="results">
-        <h1>{user.Name}</h1>
-        <h3>{user.ID}</h3>
-        {/* <p>{JSON.stringify(user)}</p> */}
-        <img src={user.Avatar} alt="Your Character Avatar" />
+      <div onClick={() => {
+            history.push("/character")
+          }}>
+        <CharImageList items={matches.items} />
       </div>
     </div>
   );
